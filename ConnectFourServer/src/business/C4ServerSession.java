@@ -38,32 +38,41 @@ public class C4ServerSession {
 			switch(message[0])
 			{
 				case 0:
+					playGame = true;
+					System.out.println("Game started");
+					Network.sendMessage(clntSock, new byte[]{10,2,3});
 					this.playGame();
 					break;
 				case 9:
 					playSession = false;
-					
+					System.out.println("Game ended");
 					break;
 				default:
+					System.out.println("default");
 			}
-			//case
-			//if the client sends lets play 0.0.0
-			//respond to lets play set playGame to true
-			//if they send a 1.1.1
-			//playsession = false;
-
-			
-
 		}
-		
 	}
-	private void playGame() {
+	private void playGame(){
+		//Game class initialization
+		
 		while(playGame)
 		{
 			//listen for stuff
 			//do stuff
 			// when the game logic decides the game over
 			//playgame = false
+			try{
+				message = Network.receiveMessage(clntSock);
+				if(message[0] == 1){
+					System.out.println("Game resumed");
+					//Network.sendMessage(clntSock, message);
+				}
+				else
+					playGame = false;
+			}catch(IOException e){
+				playGame = false;
+				playSession = false;
+			}
 		}
 		
 	}
