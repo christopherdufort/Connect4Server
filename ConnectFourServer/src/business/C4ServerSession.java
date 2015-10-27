@@ -17,6 +17,7 @@ import game.Game;
  * 
  */
 
+//FIXME handle connection reset
 
 public class C4ServerSession {
 
@@ -60,6 +61,7 @@ public class C4ServerSession {
 		
 		while(playGame)
 		{
+			System.out.println("Waiting for move...");
 			message = Network.receiveMessage(clntSock);
 			//do stuff
 			// when the game logic decides the game over
