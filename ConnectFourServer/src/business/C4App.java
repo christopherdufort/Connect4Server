@@ -10,7 +10,7 @@ import java.io.IOException;
  *
  */
 public class C4App {
-
+//TODO rename class to C4ServerApp
 	/**
 	 * @param args
 	 * @throws IOException 

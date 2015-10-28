@@ -9,7 +9,13 @@ import game.Game;
  * First.Second.Third
  * 0.0.0	-	Let's play?
  * 1.0.0	-	Yes let's play
+ * 2.0.0	-	Client Move [position column] , [position row]
+ * 3.0.0	-	Server Move [position column] , [position row]
+ * 4.0.0 	- 	Server Win
+ * 5.0.0 	-	Client Win
+ * 6.0.0	-	Tie
  * 
+ * 9.0.0	-	GameOver Request from client.
  * 
  * @author Christopher
  * @author Elliot
@@ -24,7 +30,9 @@ public class C4ServerSession {
 	private Socket clntSock;
 	private boolean playSession;
 	private boolean playGame;
+	private boolean clientsTurn;
 	private byte[] message;
+	private byte[] returnMessage;
 	private Game myGame;
 	
 	public C4ServerSession(Socket clntSock) 
@@ -33,6 +41,7 @@ public class C4ServerSession {
 		this.playSession = true;
 		this.playGame = false;
 		this.myGame = new Game();
+		this.clientsTurn = true;
 	}
 	public void startSession() throws IOException {		
 		while(playSession)
@@ -63,16 +72,13 @@ public class C4ServerSession {
 		{
 			System.out.println("Waiting for move...");
 			message = Network.receiveMessage(clntSock);
-			//do stuff
-			// when the game logic decides the game over
-			//playgame = false
-			//try{
+			System.out.println("Received Message was " + message[0]);
 				switch(message[0])
 				{
-					case 11:
+					case 2: //Client move
 						byte[] moveMade = new byte[]{message[1], message[2]};
 						System.out.println("Client Move received.");
-						myGame.updateArray(moveMade);
+						returnMessage = myGame.gameLogic(clientsTurn, moveMade);
 						break;
 					case 9:
 						System.out.println("request to end game received");
@@ -81,19 +87,7 @@ public class C4ServerSession {
 					default:
 						System.out.println("default");
 				}
-				//message = Network.receiveMessage(clntSock);
-				//if(message[0] == 1){
-				//	System.out.println("Game resumed");
-				//	//Network.sendMessage(clntSock, message);
-				//}
-				//else
-				//	playGame = false;
-			//}catch(IOException e){
-			//	playGame = false;
-			//	playSession = false;
-			//}
-		//}
-		
+
 		}
 	}
 }
