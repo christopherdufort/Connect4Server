@@ -2,6 +2,7 @@ package business;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Random;
 
 import datacomm.Network;
 import game.Game;
@@ -73,12 +74,12 @@ public class C4ServerSession {
 			System.out.println("Waiting for move...");
 			message = Network.receiveMessage(clntSock);
 			System.out.println("Received Message was " + message[0]);
+			
 				switch(message[0])
 				{
 					case 2: //Client move
-						byte[] moveMade = new byte[]{message[1], message[2]};
 						System.out.println("Client Move received.");
-						returnMessage = myGame.gameLogic(clientsTurn, moveMade);
+						Network.sendMessage(clntSock, myGame.gameLogic(clientsTurn, message));
 						break;
 					case 9:
 						System.out.println("request to end game received");
