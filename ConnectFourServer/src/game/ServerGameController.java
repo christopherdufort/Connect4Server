@@ -1,30 +1,29 @@
 package game;
 
-import java.util.Random;
 
-public class Game {
+public class ServerGameController {
 	//Game board used as internal representation
 	//[0] = no move - [1] = Client move - [2] = server move;
-    private int[][] board;
+    private int[][] gameBoard;
     //false = client turn |OR| true = server turn
     
     private byte[] returnMessage;
 	private boolean clientsTurn;
     
-    public Game() {
-    	this.board = new int[6][7];
+    public ServerGameController() {
+    	this.gameBoard = new int[7][6];
     }
     
     public byte[] findEmptyPos()
     {
 		byte[] returner = new byte[2];	
 		
-		for(int i = 0; i < 6; i++)
+		for(int i = 0; i < 7; i++)
 		{		
 			
-			for(int ctr = 0; ctr < 7; ctr ++)
+			for(int ctr = 0; ctr < 6; ctr ++)
 			{
-				if (board[i][ctr] == 0)
+				if (gameBoard[i][ctr] == 0)
 				{
 					returner[0] = (byte) i;
 					returner[1] = (byte) ctr;
@@ -43,13 +42,14 @@ public class Game {
     		//AI LOGIC is aware of board.
     	//AI LOGIC HERE ONLY MAKE VALID MOVES
     	this.clientsTurn = false; //its a server move now
-    	updateArray(aiMove);
+    	updateArray(aiMove[1], aiMove[2]);
+    	System.out.println("AI move: " + aiMove[1] + ", "+aiMove[2]);
     	return aiMove;
     }
     
     public byte[] gameLogic(boolean clientsTurn, byte[] moveMade){
     	this.clientsTurn = clientsTurn;//this method is called by session
-    	updateArray(moveMade);
+    	updateArray(moveMade[1], moveMade[2]);
     		
     	if (checkIfGameIsOver() == 1)
     	{
@@ -78,14 +78,14 @@ public class Game {
     	return returnMessage;
     }
     
-    private void updateArray(byte[] moveMade) {
+    private void updateArray(int column, int row) {
     	if (clientsTurn)
     	{
-    		this.board[moveMade[0]][moveMade[1]]= 2;
+    		this.gameBoard[column][row]= 2;
     	}
     	else 
     	{
-    		this.board[moveMade[0]][moveMade[1]]= 1;
+    		this.gameBoard[column][row]= 1;
     	}
     	displayBoard(); //Delete this if we dont want?
 	}
@@ -114,13 +114,13 @@ public class Game {
     public void displayBoard(){
     	System.out.println("current internal board ----- ");
     	//TODO check loop logic 
-    	for(int row = 0; row < board[0].length - 1; row ++)
-    	{	
-    		for(int column = 0; column < board[1].length; column ++)
+    	for(int i = 5; i > -1 ; i--)
+    	{
+    		for (int j = 0; j < 7; j++)
     		{
-    			System.out.print(board[row][column] + "  ");
+    			System.out.print(this.gameBoard[j][i] + " ");
     		}
     		System.out.println();
-    	}
+    	}	
     }
 }

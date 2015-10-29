@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.Random;
 
 import datacomm.Network;
-import game.Game;
+import game.ServerGameController;
 /*
  * First.Second.Third
  * 0.0.0	-	Let's play?
@@ -34,14 +34,14 @@ public class C4ServerSession {
 	private boolean clientsTurn;
 	private byte[] message;
 	private byte[] returnMessage;
-	private Game myGame;
+	private ServerGameController myGame;
 	
 	public C4ServerSession(Socket clntSock) 
 	{
 		this.clntSock = clntSock;
 		this.playSession = true;
 		this.playGame = false;
-		this.myGame = new Game();
+		this.myGame = new ServerGameController();
 		this.clientsTurn = true;
 	}
 	public void startSession() throws IOException {		
