@@ -1,5 +1,7 @@
 package controller;
 
+import java.util.ArrayList;
+
 public class AI 
 {
 
@@ -15,197 +17,105 @@ public class AI
 	 * 
 	 * @return
 	 */
-	public byte[] returnMove(int[][] gameBoard, byte[] moveMade) 
+	public byte[] returnMove(int[][] gameBoard) 
 	{
 		byte[] returner = new byte[2];
+		int bestStrategy = -1;
+		int bestRow = -1;
+		ArrayList<Integer> columns = new ArrayList<Integer>();
 		
-		int client = 2;
-		int server = 1;
+		for(int i = 0; i < 7; i++)
+		{
+			columns.add(findEmptyPos(gameBoard, i));
+		}
 		
-		//TODO: call determineStatterrtg
+		for(int i = 0; i < 7; i++)
+		{
+			if(columns.get(i) > bestStrategy)
+			{
+				bestStrategy = i;
+			}
+		}
+		
+		for (int row = 0; row < 6; row++) 
+		{
+			if (gameBoard[bestStrategy][row] == 0) 
+			{
+				bestRow = row;
+				break;
+			} 
+		}
+		
+		returner[0] = (byte) bestStrategy;
+		returner[1] = (byte) bestRow;
 		
 		return returner;
 	}
-
-	private int determineStrategy(int[][] gameBoard, byte[] moveMade, int player) 
+	
+	public int findEmptyPos(int[][] gameBoard, int column) 
 	{
-		int strategy = -1;
+		int result = -1;
+		int serverCtr = 0;
+		int clientCtr = 0;
+		int serverLastPos = -1;
+		int clientLastPos = -1;
 		
-		int ctr = 0;
-		
-		/***********************************check horizontal line*******************************************/
-		for(int column = moveMade[0] - 1; column >= 0; column--)
+		for (int row = 0; row < 6; row++) 
 		{
-			if(gameBoard[column][moveMade[1]] == player)
+			if (gameBoard[column][row] == 1) 
 			{
-				ctr++;
-			}
+				serverCtr++;
+				serverLastPos = row;
+			} 
 			
-			else
+			else if(gameBoard[column][row] == 2)
 			{
-				break;
-			}
-			
-		}
-		
-		
-		for(int column = moveMade[0] + 1; column < gameBoard.length; column++)
-		{
-			if(gameBoard[column][moveMade[1]] == player)
-			{
-				ctr++;
-			}
-			
-			else
-			{
-				break;
+				clientCtr++;
+				clientLastPos = row;
 			}
 		}
 		
-		if(ctr == 3)
+		if(serverCtr == 3)
 		{
-			strategy = 10;
-			
-			//if(gameBoard[][])
-			
-			return strategy;
-		}
-		
-		if(ctr == 2)
-		{
-			strategy = 9;
-			return strategy;
-		}
-		
-		if(ctr == 1)
-		{
-			strategy = 8;
-			return strategy;
-		}
-		
-		ctr = 0;
-		/******************************************************************************/
-		/*************************************check vertical line*****************************************/
-		for(int row = moveMade[1] - 1; row >= 0; row--)
-		{
-			if(gameBoard[moveMade[0]][row] == player)
-				ctr++;
-			
-			else
+			if(serverLastPos != 5)
 			{
-				break;
+				return 100;
 			}
 		}
 		
-		for(int row = moveMade[1] + 1; row < gameBoard[0].length; row++)
+		if(clientCtr == 3)
 		{
-			if(gameBoard[moveMade[0]][row] == player)
-				ctr++;
-			
-			else
+			if(clientLastPos != 5)
 			{
-				break;
+				return 90;
 			}
-			
-		}
+		} 
 		
-		if(ctr == 3)
+		if(serverCtr == 2)
 		{
-			strategy = 10;
-			return strategy;
+			if(serverLastPos != 5)
+			{
+				return 80;
+			}
 		}
 		
-		if(ctr == 2)
+		if(clientCtr == 2)
 		{
-			strategy = 9;
-			return strategy;
-		}
+			if(clientLastPos != 5)
+			{
+				return 70;
+			}
+		} 
 		
-		if(ctr == 1)
+		if(clientCtr == 1)
 		{
-			strategy = 8;
-			return strategy;
-		}
+			if(clientLastPos != 5)
+			{
+				return 50;
+			}
+		} 
 		
-		ctr = 0;
-		/******************************************************************************/
-		/*************************************check diagonal line(/)*****************************************/
-		int diagonalColumn = moveMade[0] + 1;
-		int diagonalRow = moveMade[1] + 1;
-		while(diagonalColumn < gameBoard.length && diagonalRow < gameBoard[0].length){
-			if(gameBoard[diagonalColumn][diagonalRow] == player)
-				ctr++;
-			else
-				break;
-			diagonalColumn++;
-			diagonalRow++;
-		}
-		diagonalColumn = moveMade[0] - 1;
-		diagonalRow = moveMade[1] - 1;
-		while(diagonalColumn >= 0 && diagonalRow >= 0){
-			if(gameBoard[diagonalColumn][diagonalRow] == player)
-				ctr++;
-			else
-				break;
-			diagonalColumn--;
-			diagonalRow--;
-		}
-		
-		if(ctr == 3)
-		{
-			strategy = 10;
-			return strategy;
-		}
-		
-		if(ctr == 2)
-		{
-			strategy = 9;
-			return strategy;
-		}
-		
-		ctr = 0;
-		/******************************************************************************/
-		/*************************************check diagonal line(\)*****************************************/
-		diagonalColumn = moveMade[0] + 1;
-		diagonalRow = moveMade[1] - 1;
-		while(diagonalColumn < gameBoard.length && diagonalRow >= 0){
-			if(gameBoard[diagonalColumn][diagonalRow] == player)
-				ctr++;
-			else
-				break;
-			diagonalColumn++;
-			diagonalRow--;
-		}
-		diagonalColumn = moveMade[0] - 1;
-		diagonalRow = moveMade[1] + 1;
-		while(diagonalColumn >= 0 && diagonalRow < gameBoard[0].length){
-			if(gameBoard[diagonalColumn][diagonalRow] == player)
-				ctr++;
-			else
-				break;
-			diagonalColumn--;
-			diagonalRow++;
-		}
-		
-		if(ctr == 3)
-		{
-			strategy = 10;
-			return strategy;
-		}
-		
-		if(ctr == 2)
-		{
-			strategy = 9;
-			return strategy;
-		}
-		
-		if(ctr == 1)
-		{
-			strategy = 8;
-			return strategy;
-		}
-		
-		return 0;
+		return result;
 	}
 
 }

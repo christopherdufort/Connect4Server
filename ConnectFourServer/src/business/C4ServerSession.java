@@ -30,12 +30,12 @@ public class C4ServerSession {
 			{
 				message = Network.receiveMessage(clntSock);
 				System.out.println("Received Message was " + message[0]);
+				
 				switch(MessageType.values()[message[0]])
 				{
 					case NEW_GAME:
 						playGame = true;						
 						System.out.println("Game started");
-						myGame.resetBoard();
 						Network.sendMessage(clntSock, new byte[]{MessageType.NEW_GAME.getCode(), 0, 0});
 						this.playGame();
 						break;
@@ -70,6 +70,13 @@ public class C4ServerSession {
 						playGame = false;
 						System.out.println("Game ended");
 						break;
+					case NEW_GAME:
+						gameReset();
+						playGame = true;	
+						System.out.println("Game started");
+						Network.sendMessage(clntSock, new byte[]{MessageType.NEW_GAME.getCode(), 0, 0});
+						this.playGame();
+						break;
 					default:
 						System.out.println("default");
 				}
@@ -78,5 +85,10 @@ public class C4ServerSession {
 		}catch(IOException e){
 			System.out.println("The user shut down the game.");
 		}
+	}
+	
+	private void gameReset() 
+	{
+		myGame.resetBoard();
 	}
 }

@@ -9,18 +9,22 @@ public class ServerGameController {
 	// false = client turn |OR| true = server turn
 	private boolean clientsTurn;
 	
+	AI ai;
+	
 	/**
 	 * Constructor
 	 */
 	public ServerGameController() {
 		this.gameBoard = new int[7][6];
 		clientsTurn = true;
+		ai = new AI();
 	}
 
 	//FIXME THIS NEEDS REAL AI
 	public byte[] findEmptyPos() {
 		byte[] returner = new byte[2];
 
+		/*
 		for (int i = 0; i < 7; i++) {
 
 			for (int ctr = 0; ctr < 6; ctr++) {
@@ -32,6 +36,9 @@ public class ServerGameController {
 				}
 			}
 		}
+		*/
+		
+		returner = ai.returnMove(gameBoard);
 
 		return returner;
 	}
@@ -236,6 +243,6 @@ public class ServerGameController {
 	
 	public void resetBoard()
 	{
-		this.gameBoard = new int[7][6];	
+		this.gameBoard = new int[7][6];
 	}
 }
