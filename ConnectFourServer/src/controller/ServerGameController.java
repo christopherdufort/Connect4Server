@@ -8,12 +8,16 @@ public class ServerGameController {
 	private int[][] gameBoard;
 	// false = client turn |OR| true = server turn
 	private boolean clientsTurn;
-
+	
+	/**
+	 * Constructor
+	 */
 	public ServerGameController() {
 		this.gameBoard = new int[7][6];
 		clientsTurn = true;
 	}
 
+	//FIXME THIS NEEDS REAL AI
 	public byte[] findEmptyPos() {
 		byte[] returner = new byte[2];
 
@@ -34,10 +38,8 @@ public class ServerGameController {
 
 	public byte[] aiMakeMove() {
 		byte[] b = findEmptyPos();
-		byte[] aiMove = { MessageType.MOVE.getCode(), b[0], b[1] }; // Delete
-																	// this hard
-																	// coded
-																	// message
+		byte[] aiMove = { MessageType.MOVE.getCode(), b[0], b[1] }; 
+																													
 		// AI LOGIC is aware of board.
 		// AI LOGIC HERE ONLY MAKE VALID MOVES
 		System.out.println("AI move: " + aiMove[1] + ", " + aiMove[2]);
@@ -49,15 +51,19 @@ public class ServerGameController {
 		byte[] returnMessage = {0, 0, 0};
 		switch(validateGameEnd(moveMade[1], moveMade[2], clientsTurn)){
 			case 0:
+				System.out.println("TIE");
 				returnMessage[0] = MessageType.TIE.getCode();
 				break;
 			case 1:
+				System.out.println("SERVERWIN");
 				returnMessage[0] = MessageType.SERVER_WIN.getCode();
 				break;
 			case 2:
+				System.out.println("USERWIN");
 				returnMessage[0] = MessageType.USER_WIN.getCode();
 				break;
 			case 3:
+				System.out.println("CONTINUEGAME");
 				returnMessage = aiMakeMove();
 				updateArray(returnMessage[1], returnMessage[2]);
 				break;
@@ -81,15 +87,6 @@ public class ServerGameController {
 		return clientsTurn;
 	}
 
-	public int checkIfGameIsOver() {
-		// 0 = not over
-		// 1 = win
-		// 2 = tie? TODO do we want to do this or handle move count?
-		int gameResult = 0;
-		// Logic that checks if there is a winner
-		return gameResult;
-	}
-
 	public void displayBoard() {
 		System.out.println("current internal board ----- ");
 		// TODO check loop logic
@@ -107,6 +104,7 @@ public class ServerGameController {
 	 * 1->server wins
 	 * 2->client wins
 	 * 3->game not ended
+	 * FIXME call this from server move also
 	 * 
 	 * @param board
 	 *            The full array of the board
