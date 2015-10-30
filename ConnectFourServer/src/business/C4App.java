@@ -18,7 +18,6 @@ public class C4App {
 	public static void main(String[] args) throws IOException {
 		C4Server serv = new C4Server(50000);
 		serv.startServer();
-
 	}
 
 }
