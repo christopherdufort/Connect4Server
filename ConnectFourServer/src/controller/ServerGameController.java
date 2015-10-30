@@ -7,8 +7,6 @@ public class ServerGameController {
 	// [0] = no move - [1] = Client move - [2] = server move;
 	private int[][] gameBoard;
 	// false = client turn |OR| true = server turn
-
-	private byte[] returnMessage;
 	private boolean clientsTurn;
 
 	public ServerGameController() {
@@ -22,7 +20,7 @@ public class ServerGameController {
 		for (int i = 0; i < 7; i++) {
 
 			for (int ctr = 0; ctr < 6; ctr++) {
-				
+
 				if (gameBoard[i][ctr] == 0) {
 					returner[0] = (byte) i;
 					returner[1] = (byte) ctr;
@@ -36,32 +34,33 @@ public class ServerGameController {
 
 	public byte[] aiMakeMove() {
 		byte[] b = findEmptyPos();
-		byte[] aiMove = {MessageType.MOVE.getCode(), b[0], b[1] }; // Delete this hard coded message
+		byte[] aiMove = { MessageType.MOVE.getCode(), b[0], b[1] }; // Delete
+																	// this hard
+																	// coded
+																	// message
 		// AI LOGIC is aware of board.
 		// AI LOGIC HERE ONLY MAKE VALID MOVES
-		updateArray(aiMove[1], aiMove[2]);
 		System.out.println("AI move: " + aiMove[1] + ", " + aiMove[2]);
 		return aiMove;
 	}
 
 	public byte[] gameLogic(byte[] moveMade) {
 		updateArray(moveMade[1], moveMade[2]);
-
-		if (checkIfGameIsOver() == 1) {
-			if (clientsTurn) {
-				// game is over message contains a client win (5.0.0)
-				returnMessage = new byte[] { MessageType.USER_WIN.getCode(), 0, 0 };
-			} else {
-				// game is over message contains a server win (4.0.0)
-				returnMessage = new byte[] { MessageType.SERVER_WIN.getCode(), 0, 0 };
-			}
-
-		} else if (checkIfGameIsOver() == 1) {
-			// game is over message contains a tie (6.0.0)
-			returnMessage = new byte[] { MessageType.TIE.getCode(), 0, 0 };
-		} else {
-			// game is not over ai makes a move and return that message
-			returnMessage = aiMakeMove();
+		byte[] returnMessage = {0, 0, 0};
+		switch(validateGameEnd(moveMade[1], moveMade[2], clientsTurn)){
+			case 0:
+				returnMessage[0] = MessageType.TIE.getCode();
+				break;
+			case 1:
+				returnMessage[0] = MessageType.SERVER_WIN.getCode();
+				break;
+			case 2:
+				returnMessage[0] = MessageType.USER_WIN.getCode();
+				break;
+			case 3:
+				returnMessage = aiMakeMove();
+				updateArray(returnMessage[1], returnMessage[2]);
+				break;
 		}
 		return returnMessage;
 	}
@@ -76,7 +75,7 @@ public class ServerGameController {
 		}
 		displayBoard(); // Delete this if we dont want?
 	}
-	
+
 	// true = server turn
 	public boolean isclientsTurn() {
 		return clientsTurn;
@@ -100,5 +99,140 @@ public class ServerGameController {
 			}
 			System.out.println();
 		}
+	}
+
+	/**
+	 * Method that checks if the game ends.
+	 * 0->tie
+	 * 1->server wins
+	 * 2->client wins
+	 * 3->game not ended
+	 * 
+	 * @param board
+	 *            The full array of the board
+	 * @param column
+	 *            The row in which the latest move was played
+	 * @param row
+	 *            The column in which the latest move was played
+	 * @param player
+	 *            An integer representing if the move was played by the client
+	 *            or the server
+	 * @return A boolean value if there is a win condition
+	 */
+	public int validateGameEnd(int columnMove, int rowMove, boolean isServer) {
+		int player = 0;
+		int ctr = 1;
+		System.out.println("isServer: " + isServer);
+		if(isServer)
+			player = 1;
+		else
+			player = 2;
+		
+		/***********************************check horizontal line*******************************************/
+		for(int column = columnMove - 1; column >= 0; column--){
+			if(gameBoard[column][rowMove] == player)
+				ctr++;
+			else
+				break;
+			if(ctr >= 4)
+				return player;
+		}
+		for(int column = columnMove + 1; column < gameBoard.length; column++){
+			if(gameBoard[column][rowMove] == player)
+				ctr++;
+			else
+				break;
+			if(ctr >= 4)
+				return player;
+		}
+		
+		ctr = 1;
+		/******************************************************************************/
+		/*************************************check vertical line*****************************************/
+		for(int row = rowMove - 1; row >= 0; row--){
+			if(gameBoard[columnMove][row] == player)
+				ctr++;
+			else
+				break;
+			if(ctr >= 4)
+				return player;
+		}
+		for(int row = rowMove + 1; row < gameBoard[0].length; row++){
+			if(gameBoard[columnMove][row] == player)
+				ctr++;
+			else
+				break;
+			if(ctr >= 4)
+				return player;
+		}
+		
+		ctr = 1;
+		/******************************************************************************/
+		/*************************************check diagonal line(/)*****************************************/
+		int diagonalColumn = columnMove + 1;
+		int diagonalRow = rowMove + 1;
+		while(diagonalColumn < gameBoard.length && diagonalRow < gameBoard[0].length){
+			if(gameBoard[diagonalColumn][diagonalRow] == player)
+				ctr++;
+			else
+				break;
+			if(ctr >= 4)
+				return player;
+			diagonalColumn++;
+			diagonalRow++;
+		}
+		diagonalColumn = columnMove - 1;
+		diagonalRow = rowMove - 1;
+		while(diagonalColumn >= 0 && diagonalRow >= 0){
+			if(gameBoard[diagonalColumn][diagonalRow] == player)
+				ctr++;
+			else
+				break;
+			if(ctr >= 4)
+				return player;
+			diagonalColumn--;
+			diagonalRow--;
+		}
+		
+		ctr = 1;
+		/******************************************************************************/
+		/*************************************check diagonal line(\)*****************************************/
+		diagonalColumn = columnMove + 1;
+		diagonalRow = rowMove - 1;
+		while(diagonalColumn < gameBoard.length && diagonalRow >= 0){
+			if(gameBoard[diagonalColumn][diagonalRow] == player)
+				ctr++;
+			else
+				break;
+			if(ctr >= 4)
+				return player;
+			diagonalColumn++;
+			diagonalRow--;
+		}
+		diagonalColumn = columnMove - 1;
+		diagonalRow = rowMove + 1;
+		while(diagonalColumn >= 0 && diagonalRow < gameBoard[0].length){
+			if(gameBoard[diagonalColumn][diagonalRow] == player)
+				ctr++;
+			else
+				break;
+			if(ctr >= 4)
+				return player;
+			diagonalColumn--;
+			diagonalRow++;
+		}
+		/******************************************************************************/
+		
+		
+		//if no win, checks for tie
+		boolean full = true;
+		for(int column = 0; column < gameBoard.length; column++){
+			if(gameBoard[column][5] == 0)
+				full = false;
+		}
+		if(full)
+			return 0;
+		
+		return 3;
 	}
 }
