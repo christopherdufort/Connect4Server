@@ -233,4 +233,22 @@ public class ServerGameController {
 		
 		return 3;
 	}
+	
+	public void resetBoard()
+	{
+		this.gameBoard = null;
+		this.gameBoard = new int[7][6];
+		
+		for(int i = 0; i < gameBoard.length; i++)
+		{
+			for(int j = 0; j < gameBoard[i].length; j++)
+			{
+				gameBoard[i][j] = 0;
+			}
+		}
+		
+
+		System.out.println("CASHMONEYHEROES");
+		displayBoard();
+	}
 }

@@ -33,8 +33,9 @@ public class C4ServerSession {
 				switch(MessageType.values()[message[0]])
 				{
 					case NEW_GAME:
-						playGame = true;
+						playGame = true;						
 						System.out.println("Game started");
+						myGame.resetBoard();
 						Network.sendMessage(clntSock, new byte[]{MessageType.NEW_GAME.getCode(), 0, 0});
 						this.playGame();
 						break;
