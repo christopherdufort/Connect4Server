@@ -24,7 +24,8 @@ public class C4ServerSession {
 	private Socket clntSock;
 	private boolean playSession;
 	private boolean playGame;
-	private byte[] message;
+	private byte[] messageReceived;
+	private byte[] messageToSend;
 	private ServerGameController myGame;
 	
 	/**
@@ -49,24 +50,26 @@ public class C4ServerSession {
 			while(playSession)
 			{
 				//receive initial message from client
-				message = Network.receiveMessage(clntSock);
-				System.out.println("Received Message was " + message[0]);
+				messageReceived = Network.receiveMessage(clntSock);
+				System.out.println("Received Message was " + messageReceived[0]);
 				
-				switch(MessageType.values()[message[0]])
+				switch(MessageType.fromValue(messageReceived[0]))
 				{
-					case NEW_GAME:
-						playGame = true;						
-						System.out.println("Game started");
-						Network.sendMessage(clntSock, new byte[]{MessageType.NEW_GAME.getCode(), 0, 0});
-						this.playGame();
-						break;
-					case END_SESSION:
-						playSession = false;
-						System.out.println("Session ended");
-						break;
-					default:
-						System.out.println("default");
-				}
+				case NEW_GAME:
+					myGame = new ServerGameController();
+					playGame = true;						
+					System.out.println("Game started");
+					messageToSend = new byte[]{MessageType.NEW_GAME.getCode(), 0, 0};
+					Network.sendMessage(clntSock, messageToSend);
+					this.playGame();
+					break;
+				case END_SESSION:
+					playSession = false;
+					System.out.println("Session ended");
+					break;
+				default:
+					System.out.println("default");
+			}
 			}
 		}catch(IOException e){
 			System.out.println("Session ended.");
@@ -77,17 +80,25 @@ public class C4ServerSession {
 	 * While playing a game this method will maintain a packet dance with the client while making use of the game class.
 	 */
 	private void playGame(){
+		//Game class initialization
+		MessageType checkGameEnded;
 		try{
 			while(playGame)
 			{
 				System.out.println("Waiting for move...");
-				message = Network.receiveMessage(clntSock);
-				System.out.println("Received Message was " + message[0]);
-				switch(MessageType.fromValue(message[0]))
+				messageReceived = Network.receiveMessage(clntSock);
+				System.out.println("Received Message was " + messageReceived[0]);
+				switch(MessageType.fromValue(messageReceived[0]))
 				{
 					case MOVE: //Client move
 						System.out.println("Client Move received.");
-						Network.sendMessage(clntSock, myGame.gameLogic(message));
+						messageToSend = myGame.gameLogic(messageReceived);
+						Network.sendMessage(clntSock, messageToSend);
+						checkGameEnded = MessageType.fromValue(messageToSend[0]);
+						if(checkGameEnded == MessageType.TIE ||
+								checkGameEnded == MessageType.SERVER_WIN ||
+										checkGameEnded == MessageType.USER_WIN)
+							playGame = false;
 						break;
 					case END_GAME: //Client Requested to end the game.
 						System.out.println("Request to end game received");

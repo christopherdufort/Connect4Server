@@ -23,6 +23,7 @@ public class Network {
 	public static byte[] receiveMessage(Socket socket) throws IOException
 	{
 		InputStream in = socket.getInputStream();
+		//TODO use buffer size constance instead of hardcoded 3
 		// Receive the same string back from the server
 		byte[] byteBuffer = new byte[3]; 			// Length of Packet = 3 bytes
 	    int totalBytesRcvd = 0;						// Total bytes received so far

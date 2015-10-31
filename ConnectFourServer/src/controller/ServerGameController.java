@@ -9,7 +9,7 @@ public class ServerGameController {
 	// false = client turn |OR| true = server turn
 	private boolean clientsTurn;
 	
-	AI ai;
+	private AI ai;
 	
 	/**
 	 * Constructor
@@ -19,32 +19,9 @@ public class ServerGameController {
 		clientsTurn = true;
 		ai = new AI();
 	}
-
-	//FIXME THIS NEEDS REAL AI
-	public byte[] findEmptyPos() {
-		byte[] returner = new byte[2];
-
-		/*
-		for (int i = 0; i < 7; i++) {
-
-			for (int ctr = 0; ctr < 6; ctr++) {
-
-				if (gameBoard[i][ctr] == 0) {
-					returner[0] = (byte) i;
-					returner[1] = (byte) ctr;
-					return returner;
-				}
-			}
-		}
-		*/
-		
-		returner = ai.returnMove(gameBoard);
-
-		return returner;
-	}
-
+	
 	public byte[] aiMakeMove() {
-		byte[] b = findEmptyPos();
+		byte[] b = ai.returnMove(gameBoard);
 		byte[] aiMove = { MessageType.MOVE.getCode(), b[0], b[1] }; 
 																													
 		// AI LOGIC is aware of board.
@@ -239,5 +216,6 @@ public class ServerGameController {
 			return 0;
 		
 		return 3;
-	}	
+	}
+	
 }

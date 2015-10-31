@@ -24,6 +24,8 @@ public class AI
 		int bestRow = -1;
 		ArrayList<Integer> columns = new ArrayList<Integer>();
 		
+		displayBoard(gameBoard);
+		
 		for(int i = 0; i < 7; i++)
 		{
 			columns.add(findEmptyPos(gameBoard, i));
@@ -39,6 +41,7 @@ public class AI
 		
 		for (int row = 0; row < 6; row++) 
 		{
+			System.out.println("column: " + bestStrategy + " row: " + row);
 			if (gameBoard[bestStrategy][row] == 0) 
 			{
 				bestRow = row;
@@ -118,4 +121,12 @@ public class AI
 		return result;
 	}
 
+	private void displayBoard(int[][] gameBoard) {
+		for (int i = 5; i > -1; i--) {
+			for (int j = 0; j < 7; j++) {
+				System.out.print(gameBoard[j][i] + " ");
+			}
+			System.out.println();
+		}
+	}
 }
