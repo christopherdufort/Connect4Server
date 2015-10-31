@@ -15,11 +15,9 @@ import datacomm.Network;
  * @author Christopher Dufort
  * @author Elliot Wu
  * @author Nader Baydoun
- * 
- * @version Java 1.8
- *
  */
-public class C4ServerSession {
+public class C4ServerSession 
+{
 
 	private Socket clntSock;
 	private boolean playSession;
@@ -45,8 +43,10 @@ public class C4ServerSession {
 	 * Session responsible for receiving initial messages from client.
 	 * Options include beginning a game or ending the session.
 	 */
-	public void startSession(){		
-		try{
+	public void startSession()
+	{		
+		try
+		{
 			while(playSession)
 			{
 				//receive initial message from client
@@ -55,34 +55,40 @@ public class C4ServerSession {
 				
 				switch(MessageType.fromValue(messageReceived[0]))
 				{
-				case NEW_GAME:
-					myGame = new ServerGameController();
-					playGame = true;						
-					System.out.println("Game started");
-					messageToSend = new byte[]{MessageType.NEW_GAME.getCode(), 0, 0};
-					Network.sendMessage(clntSock, messageToSend);
-					this.playGame();
-					break;
-				case END_SESSION:
-					playSession = false;
-					System.out.println("Session ended");
-					break;
-				default:
-					System.out.println("default");
+					case NEW_GAME:
+						myGame = new ServerGameController();
+						playGame = true;						
+						System.out.println("Game started");
+						messageToSend = new byte[]{MessageType.NEW_GAME.getCode(), 0, 0};
+						Network.sendMessage(clntSock, messageToSend);
+						this.playGame();
+						break;
+					case END_SESSION:
+						playSession = false;
+						System.out.println("Session ended");
+						break;
+					default:
+						System.out.println("default");
+				}
 			}
-			}
-		}catch(IOException e){
+		}
+		
+		catch(IOException e)
+		{
 			System.out.println("Session ended.");
 		}
 	}
+	
 	/**
 	 * playGame method is called when the client sends a message requesting to begin a game with the server.
 	 * While playing a game this method will maintain a packet dance with the client while making use of the game class.
 	 */
-	private void playGame(){
+	private void playGame()
+	{
 		//Game class initialization
 		MessageType checkGameEnded;
-		try{
+		try
+		{
 			while(playGame)
 			{
 				System.out.println("Waiting for move...");
@@ -115,8 +121,11 @@ public class C4ServerSession {
 					default: //Default that should not be reached.
 						System.out.println("Unrecognized Message Received.");
 				}
+			}
 		}
-		}catch(IOException e){
+		
+		catch(IOException e)
+		{
 			System.out.println("The user shut down the game.");
 		}
 	}

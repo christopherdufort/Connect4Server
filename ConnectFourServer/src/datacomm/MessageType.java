@@ -9,8 +9,6 @@ package datacomm;
  * @author Christopher Dufort
  * @author Elliot Wu
  * @author Nader Baydoun
- * 
- * @version Java 1.8
  */
 public enum MessageType {
 	NEW_GAME((byte) 0), MOVE((byte) 1), TIE((byte) 2), USER_WIN((byte) 3), SERVER_WIN((byte) 4), END_GAME(
@@ -19,47 +17,51 @@ public enum MessageType {
 	private byte code;
 
 	/**
-	 * Enum constructor accepts a code and updates private field.
+	 * Getter that returns code.
 	 * 
-	 * @param code
-	 *            provided byte value of enum.
+	 * @return code the associated value
 	 */
-	MessageType(byte code) {
-		this.code = code;
-	}
-
-	/**
-	 * 
-	 * @return code the associated value.
-	 */
-	public byte getCode() {
+	public byte getCode() 
+	{
 		return code;
 	}
 
 	/**
+	 * Determines the type of message sent by mapping numbers to enum types.
 	 * 
-	 * @param value
-	 *            byte values used within messages associated with an enum name.
+	 * @param value byte values used within messages associated with an enum name.
 	 * @return enum associated with values provided.
 	 */
-	public static MessageType fromValue(byte value) {
-		switch (value) {
-		case 0:
-			return NEW_GAME;
-		case 1:
-			return MOVE;
-		case 2:
-			return TIE;
-		case 3:
-			return USER_WIN;
-		case 4:
-			return SERVER_WIN;
-		case 8:
-			return END_GAME;
-		case 9:
-			return END_SESSION;
-		default:
-			return NO_SUCH_ENUM;
+	public static MessageType fromValue(byte value) 
+	{
+		switch (value) 
+		{
+			case 0:
+				return NEW_GAME;
+			case 1:
+				return MOVE;
+			case 2:
+				return TIE;
+			case 3:
+				return USER_WIN;
+			case 4:
+				return SERVER_WIN;
+			case 8:
+				return END_GAME;
+			case 9:
+				return END_SESSION;
+			default:
+				return NO_SUCH_ENUM;
 		}
+	}
+	
+	/**
+	 * Enum constructor accepts a code and updates private field.
+	 * 
+	 * @param code Provided byte value of enum
+	 */
+	MessageType(byte code) 
+	{
+		this.code = code;
 	}
 }

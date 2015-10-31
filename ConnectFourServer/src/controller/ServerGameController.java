@@ -2,25 +2,41 @@ package controller;
 
 import datacomm.MessageType;
 
-public class ServerGameController {
+/**
+ * Server side game controller that will handle game flow on the server.
+ * 
+ * @author Christopher Dufort
+ * @author Elliot Wu
+ * @author Nader Baydoun
+ */
+public class ServerGameController 
+{
 	// Game board used as internal representation
 	// [0] = no move - [1] = Client move - [2] = server move;
 	private int[][] gameBoard;
+	
 	// false = client turn |OR| true = server turn
 	private boolean clientsTurn;
 	
 	private AI ai;
 	
 	/**
-	 * Constructor
+	 * Constructor for the ServerGameController.
 	 */
-	public ServerGameController() {
+	public ServerGameController() 
+	{
 		this.gameBoard = new int[7][6];
 		clientsTurn = true;
 		ai = new AI();
 	}
 	
-	public byte[] aiMakeMove() {
+	/**
+	 * Method that calls the AI to retrieve a valid move for the server to play.
+	 * 
+	 * @return byte[] array that the server played
+	 */
+	public byte[] aiMakeMove() 
+	{
 		byte[] b = ai.returnMove(gameBoard);
 		byte[] aiMove = { MessageType.MOVE.getCode(), b[0], b[1] }; 
 																													
@@ -30,10 +46,19 @@ public class ServerGameController {
 		return aiMove;
 	}
 
-	public byte[] gameLogic(byte[] moveMade) {
+	/**
+	 * Method that controls state of game.
+	 * Whether to continue playing or an end game state has been achieved.
+	 * 
+	 * @param moveMade byte[] array of the move played, containing a column and a row 
+	 * @return byte[] Return message of what the server has determined to be the next step of the game
+	 */
+	public byte[] gameLogic(byte[] moveMade) 
+	{
 		updateArray(moveMade[1], moveMade[2]);
 		byte[] returnMessage = {0, 0, 0};
-		switch(validateGameEnd(moveMade[1], moveMade[2], clientsTurn)){
+		switch(validateGameEnd(moveMade[1], moveMade[2], clientsTurn))
+		{
 			case 0:
 				System.out.println("TIE");
 				returnMessage[0] = MessageType.TIE.getCode();
@@ -48,34 +73,36 @@ public class ServerGameController {
 				break;
 			case 3:
 				System.out.println("CONTINUEGAME");
-				returnMessage = aiMakeMove();
+				returnMessage = aiMakeMove();		
 				updateArray(returnMessage[1], returnMessage[2]);
 				break;
 		}
+		
 		return returnMessage;
 	}
 
-	private void updateArray(int column, int row) {
-		if (clientsTurn) {
-			this.gameBoard[column][row] = 2;
-			clientsTurn = false;
-		} else {
-			this.gameBoard[column][row] = 1;
-			clientsTurn = true;
-		}
-		displayBoard(); // Delete this if we dont want?
-	}
-
-	// true = server turn
-	public boolean isclientsTurn() {
+	/**
+	 * Returns a boolean that signals whether it's the server or client's turn.
+	 * If true then server turn.
+	 * 
+	 * @return boolean that represents if it's the client's or the server's turn
+	 */
+	public boolean isclientsTurn() 
+	{
 		return clientsTurn;
 	}
 
-	public void displayBoard() {
+	/**
+	 * Method that prints out the game board.
+	 */
+	public void displayBoard() 
+	{
 		System.out.println("current internal board ----- ");
-		// TODO check loop logic
-		for (int i = 5; i > -1; i--) {
-			for (int j = 0; j < 7; j++) {
+		//TODO check loop logic
+		for (int i = 5; i > -1; i--) 
+		{
+			for (int j = 0; j < 7; j++) 
+			{
 				System.out.print(this.gameBoard[j][i] + " ");
 			}
 			System.out.println();
@@ -101,7 +128,8 @@ public class ServerGameController {
 	 *            or the server
 	 * @return A boolean value if there is a win condition
 	 */
-	public int validateGameEnd(int columnMove, int rowMove, boolean isServer) {
+	public int validateGameEnd(int columnMove, int rowMove, boolean isServer) 
+	{
 		int player = 0;
 		int ctr = 1;
 		System.out.println("isServer: " + isServer);
@@ -216,6 +244,32 @@ public class ServerGameController {
 			return 0;
 		
 		return 3;
+	}
+	
+	/*
+	 * Method that updates the server's internal game board.
+	 * 
+	 * @param column Column to be updated
+	 * @param row Row to be updated
+	 */
+	private void updateArray(int column, int row) 
+	{
+		if (clientsTurn) 
+		{
+			this.gameBoard[column][row] = 2;
+			clientsTurn = false;
+		} 
+		
+		else 
+		{
+			//FIXME: Fatal crash that is causing a ArrayIndexOutOfBoundsException at this line
+			//If you play the game in a certain way i think the AI is trying to place something in 
+			//an invalid position
+			this.gameBoard[column][row] = 1;
+			clientsTurn = true;
+		}
+		
+		displayBoard();
 	}
 	
 }

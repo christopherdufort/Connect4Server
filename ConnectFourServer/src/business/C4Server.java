@@ -1,6 +1,3 @@
-/**
- * 
- */
 package business;
 
 import java.io.IOException;
@@ -17,10 +14,9 @@ import java.net.UnknownHostException;
  * @author Christopher Dufort
  * @author Elliot Wu
  * @author Nader Baydoun
- * 
- * @version Java 1.8
  */
-public class C4Server {
+public class C4Server 
+{
 
 	private C4ServerSession servSess;
 	private final int portNumber;
@@ -30,13 +26,11 @@ public class C4Server {
 	 * C4Server constructor accepting a port number used to reprieve the IP
 	 * address of the local host machine.
 	 * 
-	 * @param portNumber
-	 *            port number on which this server should listen for connection
-	 *            requests
-	 * @throws UnknownHostException
-	 *             in the case of no IP being found.
+	 * @param portNumber port number on which this server should listen for connection requests
+	 * @throws UnknownHostException in the case of no IP being found.
 	 */
-	public C4Server(int portNumber) throws UnknownHostException {
+	public C4Server(int portNumber) throws UnknownHostException 
+	{
 		this.portNumber = portNumber;
 
 		InetAddress addr = InetAddress.getLocalHost();
@@ -50,8 +44,8 @@ public class C4Server {
 	 * 
 	 * @throws IOException
 	 */
-	public void startServer() throws IOException {
-
+	public void startServer() throws IOException 
+	{
 		@SuppressWarnings("resource")
 		ServerSocket servSock = new ServerSocket(portNumber);
 
@@ -60,7 +54,8 @@ public class C4Server {
 
 		// Infinite loop creating and starting new sessions servicing client
 		// connections
-		while (true) {
+		while (true) 
+		{
 			Socket clntSock = servSock.accept();
 
 			servSess = new C4ServerSession(clntSock);
