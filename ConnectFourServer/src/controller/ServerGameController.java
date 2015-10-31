@@ -239,10 +239,5 @@ public class ServerGameController {
 			return 0;
 		
 		return 3;
-	}
-	
-	public void resetBoard()
-	{
-		this.gameBoard = new int[7][6];
-	}
+	}	
 }
