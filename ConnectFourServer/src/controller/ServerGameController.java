@@ -1,5 +1,10 @@
 package controller;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
+
 import datacomm.MessageType;
 
 /**
@@ -18,8 +23,6 @@ public class ServerGameController
 	// false = client turn |OR| true = server turn
 	private boolean clientsTurn;
 	
-	private AI ai;
-	
 	/**
 	 * Constructor for the ServerGameController.
 	 */
@@ -27,7 +30,6 @@ public class ServerGameController
 	{
 		this.gameBoard = new int[7][6];
 		clientsTurn = true;
-		ai = new AI();
 	}
 	
 	/**
@@ -35,18 +37,90 @@ public class ServerGameController
 	 * 
 	 * @return byte[] array that the server played
 	 */
-	public byte[] aiMakeMove() 
+	private byte[] easyAI() 
 	{
-		//TODO the aiMakeMove() will send a message with MessageType.SERVER_WIN
-		//if it knows that its making a win move
-		//the handling of server win on the client side is done
-		byte[] b = ai.returnMove(gameBoard);
-		byte[] aiMove = { MessageType.MOVE.getCode(), b[0], b[1] }; 
-																													
-		// AI LOGIC is aware of board.
-		// AI LOGIC HERE ONLY MAKE VALID MOVES
-		System.out.println("AI move: " + aiMove[1] + ", " + aiMove[2]);
-		return aiMove;
+		byte[][] socreList = new byte[14][3];
+		int column, row;
+		Random ran = new Random();
+		int randomResult;
+		for(int i = 0; i < gameBoard.length; i++){
+			column = i;
+			row = findEmptyPosition(i);
+			socreList[i][1] = (byte)column;
+			socreList[i][2] = (byte)row;
+			socreList[i+7][1] = (byte)column;
+			socreList[i+7][2] = (byte)row;
+			gameBoard[column][row] = 2;
+			switch(validateGameEnd(column ,row, false)){
+				//tie
+				case 0:
+					System.out.println("----------Tie!");
+					socreList[i][0] = (byte)2;
+					socreList[i+7][0] = (byte)2;
+				//client win
+				case 2:
+					System.out.println("----------going to win:Client!");
+					socreList[i][0] = (byte)3;
+					break;
+				//game not end
+				case 3:
+					System.out.println("----------going to win:No win!");
+					socreList[i][0] = (byte)1;
+					socreList[i+7][0] = (byte)1;
+			}
+
+			gameBoard[column][row] = 1;
+			switch(validateGameEnd(column ,row, true)){
+				//server win
+				case 1:
+					System.out.println("----------going to win:Server!");
+					socreList[i+7][0] = (byte)4;
+					break;
+			}
+			gameBoard[column][row] = 0;
+		}
+		
+		//sort the list according to the scores
+		Arrays.sort(socreList, new Comparator<byte[]>() {
+		    public int compare(byte[] a, byte[] b) {
+		        return Double.compare(a[0], b[0]);
+		    }
+		});
+
+		//just to display the score list
+		for (int j = 0; j < 14; j++) 
+		{
+			for (int i = 0; i < 3; i++) 
+			{
+				System.out.print(socreList[j][i] + " ");
+			}
+			System.out.println();
+		}
+
+		//if the highest score is 1, 
+		//this move is not going to end the game
+		//send a message with MOVE
+		//randomly pick a move
+		if(socreList[13][0] == 1){
+			randomResult = ran.nextInt(14);
+			socreList[randomResult][0] = MessageType.MOVE.getCode();
+			return socreList[randomResult];
+		}
+		//if the highest score is 2 or 3, 
+		//this move is either a tie or is needed to block the user
+		//send a message with MOVE
+		else if(socreList[13][0] == 2 || socreList[13][0] == 3){
+			socreList[13][0] = MessageType.MOVE.getCode();
+			return socreList[13];
+		}
+		//if the highest score is 4, 
+		//this is a winning move for the server
+		//send a message with SERVERWIN
+		else{
+			socreList[13][0] = MessageType.SERVER_WIN.getCode();
+			return socreList[13];
+		}
+		
 	}
 
 	/**
@@ -77,7 +151,7 @@ public class ServerGameController
 				break;
 			case 3:
 				System.out.println("CONTINUEGAME");
-				returnMessage = aiMakeMove();		
+				returnMessage = easyAI();
 				updateArray(returnMessage[1], returnMessage[2]);
 				break;
 		}
@@ -88,7 +162,7 @@ public class ServerGameController
 	/**
 	 * Method that prints out the game board.
 	 */
-	public void displayBoard() 
+	private void displayBoard() 
 	{
 		System.out.println("current internal board ----- ");
 		//TODO check loop logic
@@ -121,7 +195,7 @@ public class ServerGameController
 	 *            or the server
 	 * @return A boolean value if there is a win condition
 	 */
-	public int validateGameEnd(int columnMove, int rowMove, boolean isServer) 
+	private int validateGameEnd(int columnMove, int rowMove, boolean isServer) 
 	{
 		int player = 0;
 		int ctr = 1;
@@ -237,6 +311,29 @@ public class ServerGameController
 			return 0;
 		
 		return 3;
+	}
+	
+	/*
+	 * Method that will determine if a column has any more empty rows left by searching the gameBoard array
+	 * 
+	 * @param column to be checked for empty rows
+	 * @return int either the first empty row in the column or a -1 if column is full
+	 */
+	private int findEmptyPosition(int column) 
+	{
+
+		int result = -1;
+
+		for (int row = 0; row < 6; row++) 
+		{
+			//Checks if row is empty
+			if (gameBoard[column][row] == 0) 
+			{
+				result = row;
+				return result;
+			}
+		}
+		return result;
 	}
 	
 	/*
