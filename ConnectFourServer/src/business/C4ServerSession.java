@@ -111,13 +111,6 @@ public class C4ServerSession
 						playGame = false;
 						System.out.println("Game ended");
 						break;
-					case NEW_GAME: //Client requested to restart/begin a new game.
-						gameReset();
-						playGame = true;	
-						System.out.println("Game started");
-						Network.sendMessage(clntSock, new byte[]{MessageType.NEW_GAME.getCode(), 0, 0});
-						this.playGame();
-						break;
 					default: //Default that should not be reached.
 						System.out.println("Unrecognized Message Received.");
 				}
@@ -128,14 +121,5 @@ public class C4ServerSession
 		{
 			System.out.println("The user shut down the game.");
 		}
-	}
-	
-	/**
-	 * This method is called when the client wishes to restart the current game.
-	 * This method will create and set a new instance of the game controller.
-	 */
-	private void gameReset() 
-	{
-		this.myGame = new ServerGameController();
 	}
 }

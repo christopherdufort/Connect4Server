@@ -37,6 +37,9 @@ public class ServerGameController
 	 */
 	public byte[] aiMakeMove() 
 	{
+		//TODO the aiMakeMove() will send a message with MessageType.SERVER_WIN
+		//if it knows that its making a win move
+		//the handling of server win on the client side is done
 		byte[] b = ai.returnMove(gameBoard);
 		byte[] aiMove = { MessageType.MOVE.getCode(), b[0], b[1] }; 
 																													
@@ -56,7 +59,7 @@ public class ServerGameController
 	public byte[] gameLogic(byte[] moveMade) 
 	{
 		updateArray(moveMade[1], moveMade[2]);
-		byte[] returnMessage = {0, 0, 0};
+		byte[] returnMessage = {-10, 0, 0};
 		switch(validateGameEnd(moveMade[1], moveMade[2], clientsTurn))
 		{
 			case 0:
@@ -64,6 +67,7 @@ public class ServerGameController
 				returnMessage[0] = MessageType.TIE.getCode();
 				break;
 			case 1:
+				//never reached
 				System.out.println("SERVERWIN");
 				returnMessage[0] = MessageType.SERVER_WIN.getCode();
 				break;
@@ -79,17 +83,6 @@ public class ServerGameController
 		}
 		
 		return returnMessage;
-	}
-
-	/**
-	 * Returns a boolean that signals whether it's the server or client's turn.
-	 * If true then server turn.
-	 * 
-	 * @return boolean that represents if it's the client's or the server's turn
-	 */
-	public boolean isclientsTurn() 
-	{
-		return clientsTurn;
 	}
 
 	/**

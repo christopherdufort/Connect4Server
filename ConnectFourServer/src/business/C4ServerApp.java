@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public class C4ServerApp {
 	// Port is currently hard coded for singular thread.
-	private static int PORTNUMBER = 50000;
+	private final static int PORTNUMBER = 50000;
 
 	/**
 	 * Main method to instantiate a new server using a port number.
