@@ -31,98 +31,6 @@ public class ServerGameController
 		this.gameBoard = new int[7][6];
 		clientsTurn = true;
 	}
-	
-	/**
-	 * Method that calls the AI to retrieve a valid move for the server to play.
-	 * 
-	 * @return byte[] array that the server played
-	 */
-	private byte[] easyAI() 
-	{
-		ArrayList<byte[]> socreList = new ArrayList<>();
-		int column, row;
-		byte[] eachMove = new byte[3];
-		Random ran = new Random();
-		int randomResult;
-		for(int i = 0; i < gameBoard.length; i++){
-			column = i;
-			row = findEmptyPosition(column);
-			//if there is a spot left on this column
-			if(row != -1){
-				eachMove[1] = (byte)column;
-				eachMove[2] = (byte)row;
-				gameBoard[column][row] = 2;
-				switch(validateGameEnd(column ,row, false)){
-					//tie
-					case 0:
-						System.out.println("----------Tie!");
-						eachMove[0] = (byte)2;
-					//client win
-					case 2:
-						System.out.println("----------going to win:Client!");
-						eachMove[0] = (byte)3;
-						break;
-					//game not end
-					case 3:
-						System.out.println("----------going to win:No win!");
-						eachMove[0] = (byte)1;
-						System.out.println("Column: "+eachMove[1]+" Row: "+eachMove[2]);
-				}
-	
-				gameBoard[column][row] = 1;
-				switch(validateGameEnd(column ,row, true)){
-					//server win
-					case 1:
-						System.out.println("----------going to win:Server!");
-						eachMove[0] = (byte)4;
-						break;
-				}
-				
-				gameBoard[column][row] = 0;
-				socreList.add(new byte[]{eachMove[0], eachMove[1], eachMove[2]});
-			}
-		}
-		
-		//sort the list according to the scores
-		Collections.sort(socreList, new Comparator<byte[]>() {
-		    public int compare(byte[] a, byte[] b) {
-		        return Byte.compare(a[0], b[0]);
-		    }
-		});
-
-		//just to display the score list
-		for(byte[] item : socreList){
-			for(int i = 0; i < 3; i++)
-				System.out.print(item[i]);
-			System.out.println();
-		}
-
-		//if the highest score is 1, 
-		//this move is not going to end the game
-		//send a message with MOVE
-		//randomly pick a move
-		int lastIndex = socreList.size() - 1;
-		if(socreList.get(lastIndex)[0] == 1){
-			randomResult = ran.nextInt(lastIndex + 1);
-			socreList.get(randomResult)[0] = MessageType.MOVE.getCode();
-			return socreList.get(randomResult);
-		}
-		//if the highest score is 2 or 3, 
-		//this move is either a tie or is needed to block the user
-		//send a message with MOVE
-		else if(socreList.get(lastIndex)[0] == 2 || socreList.get(lastIndex)[0] == 3){
-			socreList.get(lastIndex)[0] = MessageType.MOVE.getCode();
-			return socreList.get(lastIndex);
-		}
-		//if the highest score is 4, 
-		//this is a winning move for the server
-		//send a message with SERVERWIN
-		else{
-			socreList.get(lastIndex)[0] = MessageType.SERVER_WIN.getCode();
-			return socreList.get(lastIndex);
-		}
-		
-	}
 
 	/**
 	 * Method that controls state of game.
@@ -183,17 +91,13 @@ public class ServerGameController
 	 * 1->server wins
 	 * 2->client wins
 	 * 3->game not ended
-	 * FIXME call this from server move also
 	 * 
-	 * @param board
-	 *            The full array of the board
 	 * @param column
 	 *            The row in which the latest move was played
 	 * @param row
 	 *            The column in which the latest move was played
 	 * @param player
-	 *            An integer representing if the move was played by the client
-	 *            or the server
+	 *            A boolean that indicate who is making the move
 	 * @return A boolean value if there is a win condition
 	 */
 	private int validateGameEnd(int columnMove, int rowMove, boolean isServer) 
@@ -314,7 +218,7 @@ public class ServerGameController
 		return 3;
 	}
 	
-	/*
+	/**
 	 * Method that will determine if a column has any more empty rows left by searching the gameBoard array
 	 * 
 	 * @param column to be checked for empty rows
@@ -337,7 +241,7 @@ public class ServerGameController
 		return result;
 	}
 	
-	/*
+	/**
 	 * Method that updates the server's internal game board.
 	 * 
 	 * @param column Column to be updated
@@ -353,14 +257,103 @@ public class ServerGameController
 		
 		else 
 		{
-			//FIXME: Fatal crash that is causing a ArrayIndexOutOfBoundsException at this line
-			//If you play the game in a certain way i think the AI is trying to place something in 
-			//an invalid position
 			this.gameBoard[column][row] = 1;
 			clientsTurn = true;
 		}
 		
 		displayBoard();
+	}
+	
+	/**
+	 * Method that calls the AI to retrieve a valid move for the server to play.
+	 * 
+	 * @return byte[] array that the server played
+	 */
+	private byte[] easyAI() 
+	{
+		ArrayList<byte[]> socreList = new ArrayList<>();
+		int column, row;
+		byte[] eachMove = new byte[3];
+		Random ran = new Random();
+		int randomResult;
+		for(int i = 0; i < gameBoard.length; i++){
+			column = i;
+			row = findEmptyPosition(column);
+			//if there is a spot left on this column
+			if(row != -1){
+				eachMove[1] = (byte)column;
+				eachMove[2] = (byte)row;
+				gameBoard[column][row] = 2;
+				switch(validateGameEnd(column ,row, false)){
+					//tie
+					case 0:
+						System.out.println("----------Tie!");
+						eachMove[0] = (byte)2;
+					//client win
+					case 2:
+						System.out.println("----------going to win:Client!");
+						eachMove[0] = (byte)3;
+						break;
+					//game not end
+					case 3:
+						System.out.println("----------going to win:No win!");
+						eachMove[0] = (byte)1;
+						System.out.println("Column: "+eachMove[1]+" Row: "+eachMove[2]);
+				}
+	
+				gameBoard[column][row] = 1;
+				switch(validateGameEnd(column ,row, true)){
+					//server win
+					case 1:
+						System.out.println("----------going to win:Server!");
+						eachMove[0] = (byte)4;
+						break;
+				}
+				
+				gameBoard[column][row] = 0;
+				socreList.add(new byte[]{eachMove[0], eachMove[1], eachMove[2]});
+			}
+		}
+		
+		//sort the list according to the scores
+		Collections.sort(socreList, new Comparator<byte[]>() {
+		    public int compare(byte[] a, byte[] b) {
+		        return Byte.compare(a[0], b[0]);
+		    }
+		});
+
+		//just to display the score list
+		for(byte[] item : socreList){
+			for(int i = 0; i < 3; i++)
+				System.out.print(item[i]);
+			System.out.println();
+		}
+
+		//if the highest score is 1, 
+		//this move is not going to end the game
+		//send a message with MOVE
+		//randomly pick a move
+		int lastIndex = socreList.size() - 1;
+		if(socreList.get(lastIndex)[0] == 1){
+			randomResult = ran.nextInt(lastIndex + 1);
+			socreList.get(randomResult)[0] = MessageType.MOVE.getCode();
+			return socreList.get(randomResult);
+		}
+		//if the highest score is 2 or 3, 
+		//this move is either a tie or is needed to block the user
+		//send a message with MOVE
+		else if(socreList.get(lastIndex)[0] == 2 || socreList.get(lastIndex)[0] == 3){
+			socreList.get(lastIndex)[0] = MessageType.MOVE.getCode();
+			return socreList.get(lastIndex);
+		}
+		//if the highest score is 4, 
+		//this is a winning move for the server
+		//send a message with SERVERWIN
+		else{
+			socreList.get(lastIndex)[0] = MessageType.SERVER_WIN.getCode();
+			return socreList.get(lastIndex);
+		}
+		
 	}
 	
 }
