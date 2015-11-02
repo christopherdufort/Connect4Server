@@ -49,11 +49,6 @@ public class ServerGameController
 				System.out.println("TIE");
 				returnMessage[0] = MessageType.TIE.getCode();
 				break;
-			case 1:
-				//never reached
-				System.out.println("SERVERWIN");
-				returnMessage[0] = MessageType.SERVER_WIN.getCode();
-				break;
 			case 2:
 				System.out.println("USERWIN");
 				returnMessage[0] = MessageType.USER_WIN.getCode();
@@ -74,7 +69,6 @@ public class ServerGameController
 	private void displayBoard() 
 	{
 		System.out.println("current internal board ----- ");
-		//TODO check loop logic
 		for (int i = 5; i > -1; i--) 
 		{
 			for (int j = 0; j < 7; j++) 
@@ -289,6 +283,7 @@ public class ServerGameController
 					case 0:
 						System.out.println("----------Tie!");
 						eachMove[0] = (byte)2;
+						break;
 					//client win
 					case 2:
 						System.out.println("----------going to win:Client!");
@@ -307,7 +302,6 @@ public class ServerGameController
 					case 1:
 						System.out.println("----------going to win:Server!");
 						eachMove[0] = (byte)4;
-						break;
 				}
 				
 				gameBoard[column][row] = 0;
@@ -342,8 +336,15 @@ public class ServerGameController
 		//if the highest score is 2 or 3, 
 		//this move is either a tie or is needed to block the user
 		//send a message with MOVE
-		else if(socreList.get(lastIndex)[0] == 2 || socreList.get(lastIndex)[0] == 3){
+		else if(socreList.get(lastIndex)[0] == 3){
 			socreList.get(lastIndex)[0] = MessageType.MOVE.getCode();
+			return socreList.get(lastIndex);
+		}
+		//if the highest score is 2, 
+		//this move is a tie
+		//send a message with MOVE
+		else if(socreList.get(lastIndex)[0] == 2){
+			socreList.get(lastIndex)[0] = MessageType.TIE.getCode();
 			return socreList.get(lastIndex);
 		}
 		//if the highest score is 4, 
