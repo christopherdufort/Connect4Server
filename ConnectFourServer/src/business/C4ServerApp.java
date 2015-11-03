@@ -9,6 +9,8 @@ import java.io.IOException;
  * @author Christopher Dufort
  * @author Elliot Wu
  * @author Nader Baydoun
+ * 
+ * @since JDK 1.8
  */
 public class C4ServerApp {
 	// Port is currently hard coded for singular thread.
@@ -17,11 +19,12 @@ public class C4ServerApp {
 	/**
 	 * Main method to instantiate a new server using a port number.
 	 * 
-	 * @param args Command line arguments that may be accepted when running.
-	 * @throws IOException Can be caused by network
+	 * @param args
+	 *            Command line arguments that may be accepted when running.
+	 * @throws IOException
+	 *             Can be caused by network
 	 */
-	public static void main(String[] args) throws IOException 
-	{
+	public static void main(String[] args) throws IOException {
 		// Create Instance of Server.
 		C4Server serv = new C4Server(PORTNUMBER);
 		// Start Server
