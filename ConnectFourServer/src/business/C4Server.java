@@ -73,9 +73,9 @@ public class C4Server {
 			clntSock.setSoTimeout(1800000);
 
 			servSess = new C4ServerSession(clntSock);
-			servSess.startSession();
-
-			clntSock.close();
+			
+			Thread thread = new Thread(servSess);
+	        thread.start();
 		}
 	}
 }

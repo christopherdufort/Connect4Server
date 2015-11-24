@@ -11,6 +11,7 @@ import java.io.IOException;
  * @author Nader Baydoun
  * 
  * @since JDK 1.8
+ * @version 1.0.0 Now with Multithreaded server.
  */
 public class C4ServerApp {
 	// Port is currently hard coded for singular thread.

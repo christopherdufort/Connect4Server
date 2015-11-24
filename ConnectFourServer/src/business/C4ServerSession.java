@@ -21,7 +21,7 @@ import datacomm.Network;
  * 
  * @since JDK 1.8
  */
-public class C4ServerSession {
+public class C4ServerSession implements Runnable {
 
 	private Socket clntSock;
 	private boolean playSession;
@@ -46,10 +46,16 @@ public class C4ServerSession {
 	}
 
 	/**
-	 * Session responsible for receiving initial messages from client. Options
-	 * include beginning a game or ending the session.
+	 * Overridden run method from Runnable interface.
+	 * Session responsible for receiving initial messages from client. 
+	 * Options include beginning a game or ending the session.
+	 * 
+	 * @since Phase 3 changed to run() from startSession()
+	 * Now runs in multiple threads.
 	 */
-	public void startSession() {
+	@Override
+	public void run() {
+		System.out.println(Thread.currentThread().getName());
 		try {
 			while (playSession) {
 				// receive initial message from client
@@ -75,6 +81,14 @@ public class C4ServerSession {
 		} catch (IOException e) {
 			System.out.println("Session ended.");
 		}
+		//Closing the socket may cause an exception.
+		try  										
+	    {
+	      clntSock.close();
+	    } catch (IOException e)
+	    {
+	      System.out.println("Exception = " +  e.getMessage());
+	    }
 	}
 
 	/**
@@ -114,4 +128,5 @@ public class C4ServerSession {
 			System.out.println("Lost connection from the client. The current game is shut down");
 		}
 	}
+
 }
