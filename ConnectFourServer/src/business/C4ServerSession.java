@@ -2,6 +2,7 @@ package business;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 import controller.ServerGameController;
 import datacomm.MessageType;
@@ -18,7 +19,7 @@ import datacomm.Network;
  * @author Christopher Dufort
  * @author Elliot Wu
  * @author Nader Baydoun
- * 
+ * @version MultiThreaded Phase 3
  * @since JDK 1.8
  */
 public class C4ServerSession implements Runnable {
@@ -50,8 +51,8 @@ public class C4ServerSession implements Runnable {
 	 * Session responsible for receiving initial messages from client. 
 	 * Options include beginning a game or ending the session.
 	 * 
-	 * @since Phase 3 changed to run() from startSession()
-	 * Now runs in multiple threads.
+	 * @since Phase 3 changed to run() from startSession() 
+	 * Now spins off multiple threads in order to provide a new session per client.
 	 */
 	@Override
 	public void run() {
@@ -124,7 +125,9 @@ public class C4ServerSession implements Runnable {
 					System.out.println("Unrecognized Message Received.");
 				}
 			}
-		} catch (IOException e) {
+		} catch (SocketException se){
+			System.out.println("Client took too long to respond, connection may be lost, check internet connection.");
+		}catch (IOException e) {
 			System.out.println("Lost connection from the client. The current game is shut down");
 		}
 	}

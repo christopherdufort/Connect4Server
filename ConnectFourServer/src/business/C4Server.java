@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
  * @author Christopher Dufort
  * @author Elliot Wu
  * @author Nader Baydoun
- * 
+ * @version MultiThreaded Phase 3
  * @since JDK 1.8
  */
 public class C4Server {
@@ -56,6 +56,7 @@ public class C4Server {
 		// Infinite loop creating and starting new sessions servicing client
 		// connections
 		while (true) {
+			//This needs to be inside the loop to not reuse the socket.
 			Socket clntSock = servSock.accept();
 
 			/*
